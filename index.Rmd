@@ -1,0 +1,124 @@
+---
+title: "My Final Project"
+author: "Melanie N, Ratie, Joan K"
+date: "Last updated on `r Sys.Date()`"
+output:
+  html_document:
+    toc: false
+    toc_depth: 2
+    toc_float: true
+    df_print: kable
+    code_folding: hide
+---
+
+<!--
+Comments in HTML are like this! 
+-->
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# load the required libraries
+library(tidyverse)
+library(openintro)
+library(scales)
+
+# import datasets
+headline_responses <- read_csv("headline-responses.csv")
+raw_data <- read_csv("raw-data.csv")
+election_result <- read_csv("2016_US_County_Level_Presidential_Results.csv")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Data wrangling of election result dataset
+election <- election_result %>%
+  group_by(state_abbr) %>%
+  summarize(total_votes_dem = sum(votes_dem),
+         total_votes_rep = sum(votes_gop),
+         total_votes_state = sum(total_votes)) %>%
+  mutate(outcome = ifelse(total_votes_dem > total_votes_rep, 'D', 'R'),
+         percentage_rep = total_votes_rep/total_votes_state)
+
+
+# Data wrangling of Buzzfeed survey dataframes
+joined_data <- raw_data %>%
+  select(ID, HCAL_REGION1_Label_US) %>%
+  inner_join(headline_responses, by = "ID") %>%
+  filter(recalled == "yes") %>%
+  mutate(abbr = state2abbr(HCAL_REGION1_Label_US),
+         wrong_or_not = ifelse(accuracy_bool == is_fake, 1, 0))
+
+# Calculate average percentage of misjudged headlines (both fake and real news) in each state
+wrangled_data <- joined_data %>%
+  group_by(ID, Weightvar, abbr, HCAL_REGION1_Label_US) %>%
+  summarize(wrong_count = sum(wrong_or_not),
+            total = n(),
+            percentage_wrong = wrong_count/total) %>%
+  group_by(HCAL_REGION1_Label_US, abbr) %>%
+  summarize(`1. Total news misjudged` = weighted.mean(percentage_wrong,
+                                                      Weightvar))
+
+# Calculate average percentage of fake news judged as true in each state
+wrangled_data_2 <- joined_data %>%
+  filter(is_fake == "True") %>%
+  group_by(ID, Weightvar, abbr) %>%
+  summarize(wrong_count_fake = sum(wrong_or_not),
+            total_fake = n(),
+            percentage_wrong_fake = wrong_count_fake/total_fake) %>%
+  group_by(abbr) %>%
+  summarize(`2. Fake news misjudged` = weighted.mean(percentage_wrong_fake,
+                                                     Weightvar))
+
+# Calculate average percentage of real news judged as false in each state
+wrangled_data_3 <- joined_data %>%
+  filter(is_fake == "False") %>%
+  group_by(ID, Weightvar, abbr) %>%
+  summarize(wrong_count_real = sum(wrong_or_not),
+            total_real = n(),
+            percentage_wrong_real = wrong_count_real/total_real) %>%
+  group_by(abbr) %>%
+  summarize(`3. Real news misjudged` = (weighted.mean(percentage_wrong_real,
+                                                      Weightvar)))
+
+# Join into one dataframe
+wrangled_data_4 <- wrangled_data %>%
+  inner_join(wrangled_data_2, by = "abbr") %>%
+  inner_join(wrangled_data_3, by = "abbr") %>%
+  gather(fake_or_real, state_average, 
+         -c("abbr", "HCAL_REGION1_Label_US")) %>%
+  inner_join(election, by = c("abbr" = "state_abbr"))
+
+
+```
+
+After the 2016 Presidential Election, the term “fake news” spread across America like wildfire. Craig Silverman, Buzzfeed's media editor, was the first to notice the steady flow of news with zero ounce of truth coming from Eastern Europe, all centred around the election.^[Wendling, Mike. "The (almost) complete history of 'fake news'" BBC, 22 Jan. 2018, [https://www.bbc.com/news/blogs-trending-42724320](https://www.bbc.com/news/blogs-trending-42724320){target="_blank"}. Accessed 17 Dec. 2018.] Disturbingly, fake news might have influenced the outcome of the election. This is why we set out to determine: Who are the most vulnerable to fake news?
+
+We drew upon raw data from a 2016 survey jointly conducted by Buzzfeed and Ipsos on 3,015 adult in the US.^[Singer-Vine, Jeremy. "2016-12-fake-news-survey" BuzzFeedNews Github, 6 Dec. 2016, [https://github.com/BuzzFeedNews/2016-12-fake-news-survey](https://github.com/BuzzFeedNews/2016-12-fake-news-survey){target="_blank"}. Accessed 17 Dec. 2018.] Respondents were randomly asked whether they recall some headlines containing a mix of fake and real news. If they do, they were then asked to categorize the news as real or fake.
+
+We calculated the percentage of headlines that an average person from each state misjudged (i.e. either fake news believed as true or real news believed as false). This percentage varies greatly by state and does not really follow a geographical or political pattern. However, when data is split into fake news and real news, it appears that the more strongly republican a state is (as indicated by the percentage of its population who voted red in the 2016 presidential election), the more likely people there believe in fake news. On the contrary, the more strongly democratic a state is, the more skeptical people tend to be even when it comes to real news!
+
+If you’re interested in the numbers beyond state average, click here to read more about how perception of fake news differs by age group, political affiliation, and candidate choice!
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width = 9.5, fig.height = 7}
+ggplot(wrangled_data_4, 
+       aes(x = percentage_rep, y = state_average,
+           text = paste('State: ', HCAL_REGION1_Label_US, 
+                        '\nPercentage of headlines misjudged: ',
+                        state_average*100,
+                        '%\nPercentage voted Republican 2016: ',
+                        percentage_rep*100,'%'),group = 1)) +
+  geom_text(label = wrangled_data_4$abbr, size = 2, check_overlap = T) +
+  geom_smooth(method = "lm", color = "#7fcdbb", size = 0.5, fill = "#7fcdbb") +
+  scale_y_continuous(labels = percent, breaks=seq(0, 1, .1)) +
+  scale_x_continuous(labels = percent, breaks=seq(0, 1, .1)) +
+  labs(title = 'Correlation between bias and state political leaning',
+       x = 'Percentage of state population who voted Republican',
+       y = 'Average percentage of headlines misjudged') +
+  facet_wrap(~fake_or_real) +
+  scale_fill_brewer(palette = "YlGnBu") +
+  theme_bw() +
+  theme(
+    text = element_text(size = 10, family = "Roboto", color = "#666666"),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"))
+
+```
