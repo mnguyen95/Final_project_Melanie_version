@@ -1,6 +1,6 @@
 ---
 title: "More information"
-author: "Melanie N, Ratie, Joan K"
+author: "Melanie N, Ratie V, Joan K"
 date: "Last updated on `r Sys.Date()`"
 output:
   html_document:
@@ -17,7 +17,6 @@ Comments in HTML are like this!
 
 ```{r, echo = FALSE, error = FALSE, message = FALSE, warning = FALSE}
 # Load the required libraries
-library(readr)
 library(tidyverse)
 library(openintro)
 library(maps)
@@ -32,7 +31,6 @@ raw_data <- read_csv("raw-data.csv")
 CREATE BASE MAP THAT SPLITS THE US INTO REGIONS FOR VISUALIZATION 1
 Adapted from: https://gis.stackexchange.com/questions/141181/how-to-create-a-us-map-in-r-with-separation-between-states-and-clear-labels
 -->
-
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Load base map from maps package
 us.map <-  map_data('state')
@@ -43,20 +41,16 @@ us.map$zone[us.map$region %in%
                 "connecticut", "rhode island", "new york", "pennsylvania",
                 "new jersey", "delaware", "district of columbia",
                 "maryland")] <- "zone 1: Northeast"
-
 us.map$zone[us.map$region %in% 
               c("south dakota", "north dakota","nebraska", "kansas",
                 "minnesota", "iowa", "missouri", "wisconsin",
                 "illinois", "indiana", "michigan", "ohio")] <- "zone 2: Midwest"
-
 us.map$zone[us.map$region %in% 
               c("oklahoma", "new mexico", "texas", "arizona")] <- "zone 3: Southwest"
-
 us.map$zone[us.map$region %in% 
               c("montana", "idaho", "wyoming", "utah",
                 "colorado", "washington", "oregon", "nevada",
                 "california")] <- "zone 4: West"
-
 us.map$zone[us.map$region %in% 
               c("kentucky", "mississippi","tennessee", 
                 "arkansas", "louisiana", "alabama", 
@@ -68,22 +62,18 @@ us.map$lat.transp[us.map$zone == "zone 1: Northeast"] <-
   us.map$lat[us.map$zone == "zone 1: Northeast"] 
 us.map$long.transp[us.map$zone == "zone 1: Northeast"] <- 
   us.map$long[us.map$zone == "zone 1: Northeast"] + 5
-
 us.map$lat.transp[us.map$zone == "zone 2: Midwest"] <- 
   us.map$lat[us.map$zone == "zone 2: Midwest"]
 us.map$long.transp[us.map$zone == "zone 2: Midwest"] <- 
   us.map$long[us.map$zone == "zone 2: Midwest"]
-
 us.map$lat.transp[us.map$zone == "zone 3: Southwest"] <- 
   us.map$lat[us.map$zone == "zone 3: Southwest"] - 3
 us.map$long.transp[us.map$zone == "zone 3: Southwest"] <- 
   us.map$long[us.map$zone == "zone 3: Southwest"] 
-
 us.map$lat.transp[us.map$zone == "zone 4: West"] <- 
   us.map$lat[us.map$zone == "zone 4: West"]
 us.map$long.transp[us.map$zone == "zone 4: West"] <-
   us.map$long[us.map$zone == "zone 4: West"] - 5
-
 us.map$lat.transp[us.map$zone == "zone 5: Southeast"] <-
   us.map$lat[us.map$zone == "zone 5: Southeast"] - 3
 us.map$long.transp[us.map$zone == "zone 5: Southeast"] <- 
@@ -99,7 +89,6 @@ states <-
 <!--
 DATA WRANGLING OF BUZZFEED SURVEY RESULTS
 -->
-
 ```{r, error = FALSE, message = FALSE, warning = FALSE}
 # Select the needed columns for merging 
 raw_data <- raw_data %>%
@@ -139,20 +128,17 @@ joined_data <- joined_data %>%
                                        "Democrat",
                                        "Independent",
                                        "Other"),
-         DWD6 = replace_na(DWD6, 0),
          presidential_candidate = case_when(DWD6 == 1 ~ "Hillary Clinton",
                                             DWD6 == 2 ~ "Donald Trump",
                                             DWD6 == 3 ~ "Gary Johnson",
                                             DWD6 == 4 ~ "Jill Stein",
-                                            DWD6 == 5 ~ "Other",
-                                            DWD6 == 0 ~ "Did not vote"),
+                                            DWD6 == 5 ~ "Other"),
          presidential_candidate = fct_relevel(presidential_candidate,
                                               "Donald Trump",
                                               "Hillary Clinton",
                                               "Gary Johnson",
                                               "Jill Stein",
-                                              "Other",
-                                              "Did not vote"),
+                                              "Other"),
          # Create variable wrong_or_not that determines if the respondent 
          # judge a headline correctly. 1 for wrong, 0 for correct
          wrong_or_not = ifelse(accuracy_bool == is_fake, 1, 0),
@@ -180,7 +166,7 @@ map_data <- avg_wrong_responses %>%
                                                     "30% - 40%", "40% - 50%", "Over 50%"))) %>%
   inner_join(us.map, by = c("US_states" = "region"))
 
-# Data wrangling for Visualization 2: Plot of political bias by age group & political party 
+# Data wrangling for Visualization 2: bias by age group & political party 
 # Group by age groups and political party
 wrong_per_age <- avg_wrong_responses %>%
   # Calculate the percentage of wrong responses
@@ -188,45 +174,31 @@ wrong_per_age <- avg_wrong_responses %>%
   summarize(mean_wrong = mean(percentage_wrong),
             mean_wrong = round(mean_wrong, digits = 2))
 
-#Calculate the mean percentage wrong for each generation
+# Calculate the mean percentage wrong for each generation
 perc_wrong_per_age <- avg_wrong_responses %>%
   group_by(age_group) %>%
   summarize(gen_wrong = mean(percentage_wrong)) %>%
   mutate(gen_wrong = round(gen_wrong, digits = 2))
 
+# Data wrangling for Visualization 3: Bias by presidential election candidate choice
+# get presidential votes based on 
+# headlines most recalled and believed to be accurate
+presidential_votes <- joined_data %>%
+  filter(headline %in% c("C","K")) %>%
+  group_by(headline, accuracy_bool) %>%
+  count(presidential_candidate) %>%
+  na.omit()
 ```
 
 <!--
 MAIN BODY STARTS HERE
 -->
 
-##Introduction of dataset
-
-The survey was conducted as a collaboration between Buzzfeed and Ipsos on 3015 respondents. Each respondent was asked whether they recall any headlines from a mix of real and fake news. 
-
-The fake headlines include:   
-* Pope Francis Shocks the World, Endorses Donald Trump for president, Releases Statement.
-* Donald Trump Sent His Own Plane To Transport 200 Stranded Marines.
-* FBI Agent Suspected in Hillary Email Leaks Found Dead in Apparent Murder Suicide.
-* Donald Trump Protestor Speaks Out: I was paid $3.500 to Protest Trump's Rally.   
-* FBI Director Comey Just Put a Trump Sign On His Front Lawn.
-
-The real headlines include:
-* Melania Trump's Girl-on-Girl Photos From Racy Shoot Revealed 
-* Barbara Bush: "I don't know how women can vote" for Trump
-* Donald Trump Says He'd 'Absolutely' Require Muslims to Register
-* Trump: "I Will Protect Our LGBTQ Citizens"
-* I Ran the C.I.A Now I'm Endorsing Hillary Clinton
-* Donald Trump on Refusing Presidential Salary: "I'm not taking it"
-
-They were then asked to determine if that headline is true or false. Out of all the respondents, 1909 of them recalled at least one headline. We analyzed their responses to determine what factors may have a correlation with people's wrong perception of news.
-
-
 ##Bias By Geographic Region
-
-The following choropleth map gives an overview of how much an average person from each state misjudge news headlines (i.e. They consider fake news true or real news false). States are split up by their respective regions (in clockwise order from the top left: West, Midwest, Northeast, Southeast, and Southwest). Interestingly, Utah and Nebraska are the states where people seem to have the best perception of news accuracy. In contrast, the five states with the highest percentage of misjudged news are Kansas, New Mexico, Vermont and Alabama. These are a mixture of red and blue state, and each belonging to a different region.
-
-Clearly, no matter which region of the US we are looking at, people are prone to misjudge headlines they see. Thus, we decided to look deeper into the survey data and examine the individual characteristics of the respondents in an attempt to determine what type of person is more vulnerable to fake news.  
+ 
+The following choropleth map gives an overview of how much an average person from each state misjudge news headlines (i.e. They consider fake news true or real news false). States are split up by their respective regions (in clockwise order from the top left: West, Midwest, Northeast, Southeast, and Southwest). Interestingly, Utah and Nebraska are the states where people seem to have the best perception of news accuracy. In contrast, the five states with the highest percentage of misjudged news are Kansas, New Mexico, Vermont and Alabama, each belonging to a different region.
+ 
+Clearly, no matter which region of the US we are looking at, people are prone to misjudge headlines they see. 
 
 ```{r, error = FALSE, message = FALSE, warning = FALSE, fig.width = 10}
 # Plot choropleth map
@@ -249,14 +221,11 @@ ggplot(map_data,
     axis.text = element_blank())
 ```
 
-
 ##Bias By Political Party Affiliation Across Age Groups
 
-As the findings from this [scatterplot](/index.html) suggested, the more strongly republican a state is, the more susceptible they were to believing fake news and the opposite applied to Democratic states. We sought to find out if there was any correlation between the percentage of headlines respondents got wrong and the political party they associated with (also taking into account non-Democratic and non-Republican parties) across different age groups.   
-
-We selected data for the 1909 respondents who recalled at least one headline and split the respondents into 5 age groups. Out of these respondents, the greatest generation had the smallest population of 2 people (which is understandable given their age, but the small sample size makes any insight for this group not meaningful) and millenials was the biggest age group with 763 total respondents. The Silent generation had 101 respondents, the Baby Boomer generation had 595 people and lastly Gen X had 448 respondents.
-
-A comparison of total bias across the age groups confirmed that Republicans and respondents affiliated with “Other” political parties generally had the highest percentage of wrong responses across the age groups, followed by Democrats and, lastly, respondents self-identified as independent voters. 
+As the findings from this [scatterplot](/index.html) suggested, the more strongly republican a state is, the more susceptible they were to believing fake news and vice versa. We sought to find out if there was any correlation between the percentage of headlines respondents got wrong and their political party by splitting respondents into 5 age groups.^[https://marketingartfully.com/2014/10/08/customer-demographics-age-ranges-numbers/] 
+ 
+A comparison of total bias across the age groups confirmed that Republicans and respondents affiliated with “Other” parties generally had the highest percentage of wrong responses across the age groups. The reason why Republicans had such high bias is probably because most of the headlines posed by the survey are pro-Donald Trump and anti-Hillary Clinton, regardless of whether the headlines are fake news or not. This was an accurate representation of news headlines posted during the 2016 Presidential Election.^[https://www.cnbc.com/2016/12/30/read-all-about-it-the-biggest-fake-news-stories-of-2016.html]  Because of this bias, Trump supporters were likely to believe most of the news and Democrats were more likely to be dubious. However, non Democrat and non-Republican respondents were more likely to be swayed in the pro-Trump, anti-Hillary direction.
 
 ```{r, error = FALSE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 8}
 # Create a plot that shows bias by Political party affiliation across age groups
@@ -282,59 +251,53 @@ ggplot() +
         axis.title.y = element_text(size = 12))
 ```
 
-The reason why Republicans had such high bias is probably because most of the headlines posed by the survey is pro-Donald Trump and anti-Hillary Clinton, regardless of whether the headline are fake news or not. This does raise a question toward the reliability of the survey conducted by Buzzfeed! Because of this bias in the survey question, Trump supporters were likely to believe most of the news to be true and Democrats were more likely to be dubious. However, independent voters and individuals associated with other parties were not in support of either Donald Trump of Hillary Clinton. It seems that they are more likely to be swayed in the pro-Trump, anti-Hillary direction.
+The values indicated on the plot also show the average percentage of headlines wrongly perceived for each age group. We can see that bias was high for the older and younger age groups, then low for the middle-lying age groups. However, the data for the Greatest Generation must be taken with a grain of salt, given that only 2 respondents recalled any headlines.
+ 
+Some studies suggest that this could be due to social media usage across the different age groups. According to Statista, Millenials are the largest social media users with 88% using some form of social media platform everyday.^[https://www.statista.com/statistics/471370/us-adults-who-use-social-networks-age/]  Only 37% of individuals above 65 use social media. This could mean that most of them are not well informed about current political affairs and are more susceptible to believing what they hear. However, Millenials use more social media and chances of them accessing fake news are highly likely.
 
-The values indicated on the plot also show the average percentage of headlines wrongly perceived for each age group and we can see that bias was high for the older age groups, then became low for the middle lying age groups, and then went high again for the younger groups. However, the data for the Greatest Generation must be taken with a grain of salt, given that only 2 respondents recalled any headlines.
+##Bias by Presidential Election Vote
 
-Some studies have suggested that a reason for this could be social media usage across the different age groups. According to Statista, Millenials are the largest social media users with 88% of Millennials using some form of social media platform everyday.  Only 37% of individuals above 65 years use social media and this could mean that most of them are not well informed about current political affairs and so become more susceptible to believing nearly anything they hear. However, Millenials use too much social media and chances of them accessing fake news are highly likely.
+We further look into how belief in fake or real news might have influenced whom respondents voted for in the 2016 presidential elections.
 
-We further look into the differences, if any exists, between people who believed in fake news vs people who believed in real news and whom they voted for in the 2016 presidential elections. 
-
-## Fake News & Presidential Elections
-
-"Does believing in Fake news being true affect the decision one made in electing presidents in
-the election of 2016?" is a question that we are interested to answer in this section. 
-In answering this question, we have plotted a bar plot that shows which presidential candidate ended up having the most votes in the 2016 presidential elections based on people who recalled seeing the headlines before and believed the news to be accurate whether the headline was real or fake. Thus, our plot is faceted based on whether the news is fake or not so that we can see if fake news made any impact on the presidential candidate that was elected.
+From the count results, we see that for fake headlines, headline C - *FBI Agent Suspected in Hillary Email Leaks Found Dead in Apparent Murder Suicide* - was the most recalled and believed to be accurate. For real headlines, headline K - *Donald Trump on Refusing Presidential Salary: “I’m not taking it”* - was the most recalled and believed to be accurate. 
 
 ```{r, error = FALSE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 8}
-# create a dataset
-# filtered based on recalled news and being accurate
-# count presidential votes based on fake news vs real news
-presidential_data <- joined_data %>%
-  filter(recalled == "yes" & accuracy_bool == "True") %>%
-  select(ID, presidential_candidate, is_fake, Weightvar, accuracy_bool) %>%
+# Display the counts per headline
+# that most people recalled and
+# believed the headline to be accurate
+# For both fake news and real news
+joined_data %>%
+  select(ID, headline, presidential_candidate, is_fake, accuracy_bool) %>%
   distinct() %>%
+  group_by(headline, is_fake) %>%
   na.omit() %>%
-  group_by(presidential_candidate, is_fake) %>%
-  count(presidential_candidate)
+  count(headline)
+```
 
-# create a plot that shows the distibutions of elected presidents
-# Based on whether the news was fake or real
-ggplot(presidential_data, aes(x = presidential_candidate, y = n, fill = presidential_candidate)) +
+
+
+```{r, error = FALSE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 8}
+# plot of presidential candidates based on headlines C and K
+ggplot(presidential_votes, aes(x = presidential_candidate, y = n, fill = presidential_candidate)) +
   geom_col() +
-  facet_wrap(~is_fake) +
-  # red - Republic, blue - Democrats
-  # goldenrod4 - Libertarian party, darkolivegreen4 - green party
-  # gray - others
-  # steelblue - didn't vote
-  scale_fill_manual(values = c("Red", "Blue", "goldenrod4", "darkolivegreen4", "gray", "steelblue")) +
-  # change the facet labels to fake news and real news
-  facet_grid(. ~ is_fake, labeller = labeller(is_fake = c(False = "True news", True = "False news"))) +
-  labs(title = "Distribution of votes among presidential candidates", x = "Presidential candidates", y = "Number of people's votes") +
-  # change the text size of the axes and the title
-  theme(text = element_text(size = 10),
+  facet_grid(headline ~ accuracy_bool,
+             labeller = labeller
+             (headline = c("C" = "Headline C (Fake news)", "K" = "Headline K (Real news)"), 
+               accuracy_bool = c("True" = "Judged as True", "False" = "Judged as False"))) +
+  scale_fill_manual(values = c("Red", "Blue", "goldenrod4", "darkolivegreen4", "gray")) +
+  labs(title = "Distribution of votes among presidential candidates", 
+       x = "Presidential candidates", 
+       y = "Number of people's votes",
+       fill = "Presidential candidate") +
+  theme_bw() +
+  theme(text = element_text(size = 10, family = "Roboto"),
         plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12))
 ```
 
-From the bar plot above, we see that for news headlines that were real and people were able to identify the news as accurate, Hillary Clinton had the most votes compared to the rest of the candidates. We also see that Donald Trump and Hillary Clinton were the top two leading presidential candidates with Hillary Clinton having only 17 more votes compared to Donald Trump.   
-However, for the news headlines that were fake and people identified these headlines as accurate, Donald Trump ended up having the most votes compared to the rest of the presidential candidates. Even though Donald Trump and Hillary Clinton were the top two leading presidential candidates with more votes, there is a huge difference between the two candidates with Donald Trump having more than twice the votes that Hillary Clinton had.   
-The Fake news headlines include:   
-A is *Pope Francis Shocks the World, Endorses Donald Trump for president, Releases Statement.*   
-B is *Donald Trump Sent His Own Plane To Transport 200 Stranded Marines.*   
-C is *FBI Agent Suspected in Hillary Email Leaks Found Dead in Apparent Murder Suicide.*  
-D is *Donald Trump Protestor Speaks Out: I was paid $3.500 to Protest Trump's Rally.*   
-E is *FBI Director Comey Just Put a Trump Sign On His Front Lawn.*   
-From the fake news headlines above, we see that these headlines are all in favor of Donald Trump with headline like C considered an anti-Hillary Clinton story ^[https://www.huffingtonpost.com/entry/facebook-fake-news-stories-zuckerberg_us_5829f34ee4b0c4b63b0da2ea] as the news puts Hillary Clinton at a bad position to be doubted as to why the FBI was found dead after being suspected to leak her emails.   
-Thus, we can assume that these people who believed the fake news headlines to be accurate were then in favor of having Donald Trump as president. Our assumption is not completely accurate as this may or may not have been one of the reasons that led to Donald Trump winning the presidential elections. Moreover, our sample size does not reflect the whole of the US but only the few respondents who completed the survey. However, fake news may have contributed directly or indirectly in either raising doubts among American voters, or changing some people's views of either having Hillary Clinton as president or changing their decisions to not wanting to vote for any president.
+The bar plot above contains information on presidential candidates that had the most votes faceted by headlines C and K, and whether the headline was believed to be accurate or not by the respondents. For headline C, fake headline, Hillary Clinton got the most votes among respondents who believed the headline to be false while Donald Trump got the most votes among those who believed the headline to be true. For headline K, real headline, Hillary Clinton got the most votes among the respondents who believed the headline to be false while Donald Trump got the most votes among people who believed the headline to be true.
+
+We see that Donald Trump got the most votes among respondents who believed the fake headline to be true and also among those who believed the real headline to be true because both headlines are in his favor. Thus, there is a correlation between what story people believe in and who they voted for. 
+
+However, our sample size only reflects a few respondents and not the entire US population, meaning that the observation may not be entirely accurate. Yet, fake news may have contributed directly or indirectly to raising doubts among American voters, either changing some people's views of having Hillary Clinton as president or changing their decision to not wanting to vote for any candidate.

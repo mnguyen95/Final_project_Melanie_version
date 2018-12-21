@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="Melanie N, Ratie, Joan K" />
+<meta name="author" content="Melanie N, Ratie V, Joan K" />
 
 
 <title>My Final Project</title>
@@ -246,8 +246,8 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">My Final Project</h1>
-<h4 class="author"><em>Melanie N, Ratie, Joan K</em></h4>
-<h4 class="date"><em>Last updated on 2018-12-19</em></h4>
+<h4 class="author"><em>Melanie N, Ratie V, Joan K</em></h4>
+<h4 class="date"><em>Last updated on 2018-12-20</em></h4>
 
 </div>
 
@@ -262,9 +262,10 @@ Source: Krista Kennell / Stone / Catwalker / Shutterstock / The Atlantic
 </p>
 </div>
 <p>After the 2016 Presidential Election, the term “fake news” spread across America like wildfire. Craig Silverman, Buzzfeed’s media editor, was the first to notice the steady flow of news with zero ounce of truth coming from Eastern Europe, all centred around the election.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> Disturbingly, fake news might have influenced the outcome of the election. This is why we set out to determine: Who are the most vulnerable to fake news?</p>
-<p>We drew upon raw data from a 2016 survey jointly conducted by Buzzfeed and Ipsos on 3,015 adult in the US.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> Respondents were randomly asked whether they recall some headlines containing a mix of fake and real news. If they do, they were then asked to categorize the news as real or fake.</p>
+<p>We drew upon raw data from a 2016 survey jointly conducted by Buzzfeed and Ipsos on 3,015 adult in the US.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> Each respondent was asked whether they recall any headlines from a mix of real and fake news. They were then asked to determine if the ones they recalled are true or false.</p>
+<p>Out of all respondents, 1909 people recalled at least one headline. We analyzed their responses to determine what factors may have a correlation with people’s wrong perception of news.</p>
 <p>We calculated the percentage of headlines that an average person from each state misjudged (i.e. either fake news believed as true or real news believed as false). This percentage varies greatly by state and does not really follow a geographical or political pattern. However, when data is split into fake news and real news, it appears that the more strongly republican a state is (as indicated by the percentage of its population who voted red in the 2016 presidential election), the more likely people there believe in fake news. On the contrary, the more strongly democratic a state is, the more skeptical people tend to be even when it comes to real news!</p>
-<p>If you’re interested in the numbers beyond state average, click <a href="/more_info.html">here</a>. Accessed 17 Dec. 2018.] to read more about how perception of fake news differs by age group, political affiliation, and candidate choice!</p>
+<p>Click <a href="/more_info.html">here</a>. Accessed 17 Dec. 2018.] to read more about how perception of fake news differs by age group, political affiliation, and candidate choice!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(wrangled_data_<span class="dv">4</span>, 
        <span class="kw">aes</span>(<span class="dt">x =</span> percentage_rep, <span class="dt">y =</span> state_average,
            <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&#39;State: &#39;</span>, HCAL_REGION1_Label_US, 

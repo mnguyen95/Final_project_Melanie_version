@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="Melanie N, Ratie, Joan K" />
+<meta name="author" content="Melanie N, Ratie V, Joan K" />
 
 
 <title>More information</title>
@@ -344,8 +344,8 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">More information</h1>
-<h4 class="author"><em>Melanie N, Ratie, Joan K</em></h4>
-<h4 class="date"><em>Last updated on 2018-12-19</em></h4>
+<h4 class="author"><em>Melanie N, Ratie V, Joan K</em></h4>
+<h4 class="date"><em>Last updated on 2018-12-20</em></h4>
 
 </div>
 
@@ -398,20 +398,17 @@ joined_data &lt;-<span class="st"> </span>joined_data <span class="op">%&gt;%</s
                                        <span class="st">&quot;Democrat&quot;</span>,
                                        <span class="st">&quot;Independent&quot;</span>,
                                        <span class="st">&quot;Other&quot;</span>),
-         <span class="dt">DWD6 =</span> <span class="kw">replace_na</span>(DWD6, <span class="dv">0</span>),
          <span class="dt">presidential_candidate =</span> <span class="kw">case_when</span>(DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;Hillary Clinton&quot;</span>,
                                             DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;Donald Trump&quot;</span>,
                                             DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> &quot;Gary Johnson&quot;</span>,
                                             DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">4</span> <span class="op">~</span><span class="st"> &quot;Jill Stein&quot;</span>,
-                                            DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">5</span> <span class="op">~</span><span class="st"> &quot;Other&quot;</span>,
-                                            DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">~</span><span class="st"> &quot;Did not vote&quot;</span>),
+                                            DWD6 <span class="op">==</span><span class="st"> </span><span class="dv">5</span> <span class="op">~</span><span class="st"> &quot;Other&quot;</span>),
          <span class="dt">presidential_candidate =</span> <span class="kw">fct_relevel</span>(presidential_candidate,
                                               <span class="st">&quot;Donald Trump&quot;</span>,
                                               <span class="st">&quot;Hillary Clinton&quot;</span>,
                                               <span class="st">&quot;Gary Johnson&quot;</span>,
                                               <span class="st">&quot;Jill Stein&quot;</span>,
-                                              <span class="st">&quot;Other&quot;</span>,
-                                              <span class="st">&quot;Did not vote&quot;</span>),
+                                              <span class="st">&quot;Other&quot;</span>),
          <span class="co"># Create variable wrong_or_not that determines if the respondent </span>
          <span class="co"># judge a headline correctly. 1 for wrong, 0 for correct</span>
          <span class="dt">wrong_or_not =</span> <span class="kw">ifelse</span>(accuracy_bool <span class="op">==</span><span class="st"> </span>is_fake, <span class="dv">1</span>, <span class="dv">0</span>),
@@ -439,7 +436,7 @@ map_data &lt;-<span class="st"> </span>avg_wrong_responses <span class="op">%&gt
                                                     <span class="st">&quot;30% - 40%&quot;</span>, <span class="st">&quot;40% - 50%&quot;</span>, <span class="st">&quot;Over 50%&quot;</span>))) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">inner_join</span>(us.map, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;US_states&quot;</span> =<span class="st"> &quot;region&quot;</span>))
 
-<span class="co"># Data wrangling for Visualization 2: Plot of political bias by age group &amp; political party </span>
+<span class="co"># Data wrangling for Visualization 2: bias by age group &amp; political party </span>
 <span class="co"># Group by age groups and political party</span>
 wrong_per_age &lt;-<span class="st"> </span>avg_wrong_responses <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="co"># Calculate the percentage of wrong responses</span>
@@ -447,41 +444,27 @@ wrong_per_age &lt;-<span class="st"> </span>avg_wrong_responses <span class="op"
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">mean_wrong =</span> <span class="kw">mean</span>(percentage_wrong),
             <span class="dt">mean_wrong =</span> <span class="kw">round</span>(mean_wrong, <span class="dt">digits =</span> <span class="dv">2</span>))
 
-<span class="co">#Calculate the mean percentage wrong for each generation</span>
+<span class="co"># Calculate the mean percentage wrong for each generation</span>
 perc_wrong_per_age &lt;-<span class="st"> </span>avg_wrong_responses <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(age_group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">gen_wrong =</span> <span class="kw">mean</span>(percentage_wrong)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gen_wrong =</span> <span class="kw">round</span>(gen_wrong, <span class="dt">digits =</span> <span class="dv">2</span>))</code></pre></div>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gen_wrong =</span> <span class="kw">round</span>(gen_wrong, <span class="dt">digits =</span> <span class="dv">2</span>))
+
+<span class="co"># Data wrangling for Visualization 3: Bias by presidential election candidate choice</span>
+<span class="co"># get presidential votes based on </span>
+<span class="co"># headlines most recalled and believed to be accurate</span>
+presidential_votes &lt;-<span class="st"> </span>joined_data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(headline <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;K&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(headline, accuracy_bool) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">count</span>(presidential_candidate) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">na.omit</span>()</code></pre></div>
 <!--
 MAIN BODY STARTS HERE
 -->
-<div id="introduction-of-dataset" class="section level2">
-<h2>Introduction of dataset</h2>
-<p>The survey was conducted as a collaboration between Buzzfeed and Ipsos on 3015 respondents. Each respondent was asked whether they recall any headlines from a mix of real and fake news.</p>
-<p>The fake headlines include:</p>
-<ul>
-<li>Pope Francis Shocks the World, Endorses Donald Trump for president, Releases Statement.</li>
-<li>Donald Trump Sent His Own Plane To Transport 200 Stranded Marines.</li>
-<li>FBI Agent Suspected in Hillary Email Leaks Found Dead in Apparent Murder Suicide.</li>
-<li>Donald Trump Protestor Speaks Out: I was paid $3.500 to Protest Trump’s Rally.<br />
-</li>
-<li>FBI Director Comey Just Put a Trump Sign On His Front Lawn.</li>
-</ul>
-<p>The real headlines include:</p>
-<ul>
-<li>Melania Trump’s Girl-on-Girl Photos From Racy Shoot Revealed</li>
-<li>Barbara Bush: “I don’t know how women can vote” for Trump</li>
-<li>Donald Trump Says He’d ‘Absolutely’ Require Muslims to Register</li>
-<li>Trump: “I Will Protect Our LGBTQ Citizens”</li>
-<li>I Ran the C.I.A Now I’m Endorsing Hillary Clinton</li>
-<li>Donald Trump on Refusing Presidential Salary: “I’m not taking it”</li>
-</ul>
-<p>They were then asked to determine if that headline is true or false. Out of all the respondents, 1909 of them recalled at least one headline. We analyzed their responses to determine what factors may have a correlation with people’s wrong perception of news.</p>
-</div>
 <div id="bias-by-geographic-region" class="section level2">
 <h2>Bias By Geographic Region</h2>
-<p>The following choropleth map gives an overview of how much an average person from each state misjudge news headlines (i.e. They consider fake news true or real news false). States are split up by their respective regions (in clockwise order from the top left: West, Midwest, Northeast, Southeast, and Southwest). Interestingly, Utah and Nebraska are the states where people seem to have the best perception of news accuracy. In contrast, the five states with the highest percentage of misjudged news are Kansas, New Mexico, Vermont and Alabama. These are a mixture of red and blue state, and each belonging to a different region.</p>
-<p>Clearly, no matter which region of the US we are looking at, people are prone to misjudge headlines they see. Thus, we decided to look deeper into the survey data and examine the individual characteristics of the respondents in an attempt to determine what type of person is more vulnerable to fake news.</p>
+<p>The following choropleth map gives an overview of how much an average person from each state misjudge news headlines (i.e. They consider fake news true or real news false). States are split up by their respective regions (in clockwise order from the top left: West, Midwest, Northeast, Southeast, and Southwest). Interestingly, Utah and Nebraska are the states where people seem to have the best perception of news accuracy. In contrast, the five states with the highest percentage of misjudged news are Kansas, New Mexico, Vermont and Alabama, each belonging to a different region.</p>
+<p>Clearly, no matter which region of the US we are looking at, people are prone to misjudge headlines they see.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Plot choropleth map</span>
 <span class="kw">ggplot</span>(map_data,  
        <span class="kw">aes</span>(<span class="dt">x =</span> long.transp, <span class="dt">y =</span> lat.transp), <span class="dt">colour =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span><span class="st"> </span>
@@ -504,9 +487,8 @@ MAIN BODY STARTS HERE
 </div>
 <div id="bias-by-political-party-affiliation-across-age-groups" class="section level2">
 <h2>Bias By Political Party Affiliation Across Age Groups</h2>
-<p>As the findings from this <a href="/index.html">scatterplot</a> suggested, the more strongly republican a state is, the more susceptible they were to believing fake news and the opposite applied to Democratic states. We sought to find out if there was any correlation between the percentage of headlines respondents got wrong and the political party they associated with (also taking into account non-Democratic and non-Republican parties) across different age groups.</p>
-<p>We selected data for the 1909 respondents who recalled at least one headline and split the respondents into 5 age groups. Out of these respondents, the greatest generation had the smallest population of 2 people (which is understandable given their age, but the small sample size makes any insight for this group not meaningful) and millenials was the biggest age group with 763 total respondents. The Silent generation had 101 respondents, the Baby Boomer generation had 595 people and lastly Gen X had 448 respondents.</p>
-<p>A comparison of total bias across the age groups confirmed that Republicans and respondents affiliated with “Other” political parties generally had the highest percentage of wrong responses across the age groups, followed by Democrats and, lastly, respondents self-identified as independent voters.</p>
+<p>As the findings from this <a href="/index.html">scatterplot</a> suggested, the more strongly republican a state is, the more susceptible they were to believing fake news and vice versa. We sought to find out if there was any correlation between the percentage of headlines respondents got wrong and their political party by splitting respondents into 5 age groups.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<p>A comparison of total bias across the age groups confirmed that Republicans and respondents affiliated with “Other” parties generally had the highest percentage of wrong responses across the age groups. The reason why Republicans had such high bias is probably because most of the headlines posed by the survey are pro-Donald Trump and anti-Hillary Clinton, regardless of whether the headlines are fake news or not. This was an accurate representation of news headlines posted during the 2016 Presidential Election.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> Because of this bias, Trump supporters were likely to believe most of the news and Democrats were more likely to be dubious. However, non Democrat and non-Republican respondents were more likely to be swayed in the pro-Trump, anti-Hillary direction.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a plot that shows bias by Political party affiliation across age groups</span>
 <span class="kw">ggplot</span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_col</span>(<span class="dt">data =</span> wrong_per_age, <span class="dt">position=</span><span class="st">&quot;dodge&quot;</span>, 
@@ -529,59 +511,119 @@ MAIN BODY STARTS HERE
         <span class="dt">axis.title.x =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>),
         <span class="dt">axis.title.y =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>))</code></pre></div>
 <p><img src="more_info_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
-<p>The reason why Republicans had such high bias is probably because most of the headlines posed by the survey is pro-Donald Trump and anti-Hillary Clinton, regardless of whether the headline are fake news or not. This does raise a question toward the reliability of the survey conducted by Buzzfeed! Because of this bias in the survey question, Trump supporters were likely to believe most of the news to be true and Democrats were more likely to be dubious. However, independent voters and individuals associated with other parties were not in support of either Donald Trump of Hillary Clinton. It seems that they are more likely to be swayed in the pro-Trump, anti-Hillary direction.</p>
-<p>The values indicated on the plot also show the average percentage of headlines wrongly perceived for each age group and we can see that bias was high for the older age groups, then became low for the middle lying age groups, and then went high again for the younger groups. However, the data for the Greatest Generation must be taken with a grain of salt, given that only 2 respondents recalled any headlines.</p>
-<p>Some studies have suggested that a reason for this could be social media usage across the different age groups. According to Statista, Millenials are the largest social media users with 88% of Millennials using some form of social media platform everyday. Only 37% of individuals above 65 years use social media and this could mean that most of them are not well informed about current political affairs and so become more susceptible to believing nearly anything they hear. However, Millenials use too much social media and chances of them accessing fake news are highly likely.</p>
-<p>We further look into the differences, if any exists, between people who believed in fake news vs people who believed in real news and whom they voted for in the 2016 presidential elections.</p>
+<p>The values indicated on the plot also show the average percentage of headlines wrongly perceived for each age group. We can see that bias was high for the older and younger age groups, then low for the middle-lying age groups. However, the data for the Greatest Generation must be taken with a grain of salt, given that only 2 respondents recalled any headlines.</p>
+<p>Some studies suggest that this could be due to social media usage across the different age groups. According to Statista, Millenials are the largest social media users with 88% using some form of social media platform everyday.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> Only 37% of individuals above 65 use social media. This could mean that most of them are not well informed about current political affairs and are more susceptible to believing what they hear. However, Millenials use more social media and chances of them accessing fake news are highly likely.</p>
 </div>
-<div id="fake-news-presidential-elections" class="section level2">
-<h2>Fake News &amp; Presidential Elections</h2>
-<p>“Does believing in Fake news being true affect the decision one made in electing presidents in the election of 2016?” is a question that we are interested to answer in this section. In answering this question, we have plotted a bar plot that shows which presidential candidate ended up having the most votes in the 2016 presidential elections based on people who recalled seeing the headlines before and believed the news to be accurate whether the headline was real or fake. Thus, our plot is faceted based on whether the news is fake or not so that we can see if fake news made any impact on the presidential candidate that was elected.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create a dataset</span>
-<span class="co"># filtered based on recalled news and being accurate</span>
-<span class="co"># count presidential votes based on fake news vs real news</span>
-presidential_data &lt;-<span class="st"> </span>joined_data <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">filter</span>(recalled <span class="op">==</span><span class="st"> &quot;yes&quot;</span> <span class="op">&amp;</span><span class="st"> </span>accuracy_bool <span class="op">==</span><span class="st"> &quot;True&quot;</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(ID, presidential_candidate, is_fake, Weightvar, accuracy_bool) <span class="op">%&gt;%</span>
+<div id="bias-by-presidential-election-vote" class="section level2">
+<h2>Bias by Presidential Election Vote</h2>
+<p>We further look into how belief in fake or real news might have influenced whom respondents voted for in the 2016 presidential elections.</p>
+<p>From the count results, we see that for fake headlines, headline C - <em>FBI Agent Suspected in Hillary Email Leaks Found Dead in Apparent Murder Suicide</em> - was the most recalled and believed to be accurate. For real headlines, headline K - <em>Donald Trump on Refusing Presidential Salary: “I’m not taking it”</em> - was the most recalled and believed to be accurate.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Display the counts per headline</span>
+<span class="co"># that most people recalled and</span>
+<span class="co"># believed the headline to be accurate</span>
+<span class="co"># For both fake news and real news</span>
+joined_data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(ID, headline, presidential_candidate, is_fake, accuracy_bool) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(headline, is_fake) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">na.omit</span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(presidential_candidate, is_fake) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">count</span>(presidential_candidate)
-
-<span class="co"># create a plot that shows the distibutions of elected presidents</span>
-<span class="co"># Based on whether the news was fake or real</span>
-<span class="kw">ggplot</span>(presidential_data, <span class="kw">aes</span>(<span class="dt">x =</span> presidential_candidate, <span class="dt">y =</span> n, <span class="dt">fill =</span> presidential_candidate)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">count</span>(headline)</code></pre></div>
+<div class="kable-table">
+<table>
+<thead>
+<tr class="header">
+<th align="left">headline</th>
+<th align="left">is_fake</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="left">True</td>
+<td align="right">246</td>
+</tr>
+<tr class="even">
+<td align="left">B</td>
+<td align="left">True</td>
+<td align="right">199</td>
+</tr>
+<tr class="odd">
+<td align="left">C</td>
+<td align="left">True</td>
+<td align="right">305</td>
+</tr>
+<tr class="even">
+<td align="left">D</td>
+<td align="left">True</td>
+<td align="right">277</td>
+</tr>
+<tr class="odd">
+<td align="left">E</td>
+<td align="left">True</td>
+<td align="right">127</td>
+</tr>
+<tr class="even">
+<td align="left">F</td>
+<td align="left">False</td>
+<td align="right">264</td>
+</tr>
+<tr class="odd">
+<td align="left">G</td>
+<td align="left">False</td>
+<td align="right">286</td>
+</tr>
+<tr class="even">
+<td align="left">H</td>
+<td align="left">False</td>
+<td align="right">408</td>
+</tr>
+<tr class="odd">
+<td align="left">I</td>
+<td align="left">False</td>
+<td align="right">324</td>
+</tr>
+<tr class="even">
+<td align="left">J</td>
+<td align="left">False</td>
+<td align="right">115</td>
+</tr>
+<tr class="odd">
+<td align="left">K</td>
+<td align="left">False</td>
+<td align="right">699</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot of presidential candidates based on headlines C and K</span>
+<span class="kw">ggplot</span>(presidential_votes, <span class="kw">aes</span>(<span class="dt">x =</span> presidential_candidate, <span class="dt">y =</span> n, <span class="dt">fill =</span> presidential_candidate)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_col</span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>is_fake) <span class="op">+</span>
-<span class="st">  </span><span class="co"># red - Republic, blue - Democrats</span>
-<span class="st">  </span><span class="co"># goldenrod4 - Libertarian party, darkolivegreen4 - green party</span>
-<span class="st">  </span><span class="co"># gray - others</span>
-<span class="st">  </span><span class="co"># steelblue - didn&#39;t vote</span>
-<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;Red&quot;</span>, <span class="st">&quot;Blue&quot;</span>, <span class="st">&quot;goldenrod4&quot;</span>, <span class="st">&quot;darkolivegreen4&quot;</span>, <span class="st">&quot;gray&quot;</span>, <span class="st">&quot;steelblue&quot;</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="co"># change the facet labels to fake news and real news</span>
-<span class="st">  </span><span class="kw">facet_grid</span>(. <span class="op">~</span><span class="st"> </span>is_fake, <span class="dt">labeller =</span> <span class="kw">labeller</span>(<span class="dt">is_fake =</span> <span class="kw">c</span>(<span class="dt">False =</span> <span class="st">&quot;True news&quot;</span>, <span class="dt">True =</span> <span class="st">&quot;False news&quot;</span>))) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Distribution of votes among presidential candidates&quot;</span>, <span class="dt">x =</span> <span class="st">&quot;Presidential candidates&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Number of people&#39;s votes&quot;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="co"># change the text size of the axes and the title</span>
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">10</span>),
+<span class="st">  </span><span class="kw">facet_grid</span>(headline <span class="op">~</span><span class="st"> </span>accuracy_bool,
+             <span class="dt">labeller =</span> labeller
+             (<span class="dt">headline =</span> <span class="kw">c</span>(<span class="st">&quot;C&quot;</span> =<span class="st"> &quot;Headline C (Fake news)&quot;</span>, <span class="st">&quot;K&quot;</span> =<span class="st"> &quot;Headline K (Real news)&quot;</span>), 
+               <span class="dt">accuracy_bool =</span> <span class="kw">c</span>(<span class="st">&quot;True&quot;</span> =<span class="st"> &quot;Judged as True&quot;</span>, <span class="st">&quot;False&quot;</span> =<span class="st"> &quot;Judged as False&quot;</span>))) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;Red&quot;</span>, <span class="st">&quot;Blue&quot;</span>, <span class="st">&quot;goldenrod4&quot;</span>, <span class="st">&quot;darkolivegreen4&quot;</span>, <span class="st">&quot;gray&quot;</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Distribution of votes among presidential candidates&quot;</span>, 
+       <span class="dt">x =</span> <span class="st">&quot;Presidential candidates&quot;</span>, 
+       <span class="dt">y =</span> <span class="st">&quot;Number of people&#39;s votes&quot;</span>,
+       <span class="dt">fill =</span> <span class="st">&quot;Presidential candidate&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">10</span>, <span class="dt">family =</span> <span class="st">&quot;Roboto&quot;</span>),
         <span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>, <span class="dt">size =</span> <span class="dv">12</span>, <span class="dt">face =</span> <span class="st">&quot;bold&quot;</span>),
         <span class="dt">axis.title.x =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>),
         <span class="dt">axis.title.y =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>))</code></pre></div>
-<p><img src="more_info_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
-<p>From the bar plot above, we see that for news headlines that were real and people were able to identify the news as accurate, Hillary Clinton had the most votes compared to the rest of the candidates. We also see that Donald Trump and Hillary Clinton were the top two leading presidential candidates with Hillary Clinton having only 17 more votes compared to Donald Trump.<br />
-However, for the news headlines that were fake and people identified these headlines as accurate, Donald Trump ended up having the most votes compared to the rest of the presidential candidates. Even though Donald Trump and Hillary Clinton were the top two leading presidential candidates with more votes, there is a huge difference between the two candidates with Donald Trump having more than twice the votes that Hillary Clinton had.<br />
-The Fake news headlines include:<br />
-A is <em>Pope Francis Shocks the World, Endorses Donald Trump for president, Releases Statement.</em><br />
-B is <em>Donald Trump Sent His Own Plane To Transport 200 Stranded Marines.</em><br />
-C is <em>FBI Agent Suspected in Hillary Email Leaks Found Dead in Apparent Murder Suicide.</em><br />
-D is <em>Donald Trump Protestor Speaks Out: I was paid $3.500 to Protest Trump’s Rally.</em><br />
-E is <em>FBI Director Comey Just Put a Trump Sign On His Front Lawn.</em><br />
-From the fake news headlines above, we see that these headlines are all in favor of Donald Trump with headline like C considered an anti-Hillary Clinton story <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> as the news puts Hillary Clinton at a bad position to be doubted as to why the FBI was found dead after being suspected to leak her emails.<br />
-Thus, we can assume that these people who believed the fake news headlines to be accurate were then in favor of having Donald Trump as president. Our assumption is not completely accurate as this may or may not have been one of the reasons that led to Donald Trump winning the presidential elections. Moreover, our sample size does not reflect the whole of the US but only the few respondents who completed the survey. However, fake news may have contributed directly or indirectly in either raising doubts among American voters, or changing some people’s views of either having Hillary Clinton as president or changing their decisions to not wanting to vote for any president.</p>
+<p><img src="more_info_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p>The bar plot above contains information on presidential candidates that had the most votes faceted by headlines C and K, and whether the headline was believed to be accurate or not by the respondents. For headline C, fake headline, Hillary Clinton got the most votes among respondents who believed the headline to be false while Donald Trump got the most votes among those who believed the headline to be true. For headline K, real headline, Hillary Clinton got the most votes among the respondents who believed the headline to be false while Donald Trump got the most votes among people who believed the headline to be true.</p>
+<p>We see that Donald Trump got the most votes among respondents who believed the fake headline to be true and also among those who believed the real headline to be true because both headlines are in his favor. Thus, there is a correlation between what story people believe in and who they voted for.</p>
+<p>However, our sample size only reflects a few respondents and not the entire US population, meaning that the observation may not be entirely accurate. Yet, fake news may have contributed directly or indirectly to raising doubts among American voters, either changing some people’s views of having Hillary Clinton as president or changing their decision to not wanting to vote for any candidate.</p>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="https://www.huffingtonpost.com/entry/facebook-fake-news-stories-zuckerberg_us_5829f34ee4b0c4b63b0da2ea" class="uri">https://www.huffingtonpost.com/entry/facebook-fake-news-stories-zuckerberg_us_5829f34ee4b0c4b63b0da2ea</a><a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p><a href="https://marketingartfully.com/2014/10/08/customer-demographics-age-ranges-numbers/" class="uri">https://marketingartfully.com/2014/10/08/customer-demographics-age-ranges-numbers/</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="https://www.cnbc.com/2016/12/30/read-all-about-it-the-biggest-fake-news-stories-of-2016.html" class="uri">https://www.cnbc.com/2016/12/30/read-all-about-it-the-biggest-fake-news-stories-of-2016.html</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="https://www.statista.com/statistics/471370/us-adults-who-use-social-networks-age/" class="uri">https://www.statista.com/statistics/471370/us-adults-who-use-social-networks-age/</a><a href="#fnref3">↩</a></p></li>
 </ol>
 </div>
 
